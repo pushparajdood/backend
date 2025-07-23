@@ -1,0 +1,9 @@
+{
+  "name": "lms-auth",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/lms-auth/src",
+  "projectType": "library",
+  "tags": [],
+  "// targets": "to see all targets run: nx show project lms-auth --web",
+  "targets": {}
+}

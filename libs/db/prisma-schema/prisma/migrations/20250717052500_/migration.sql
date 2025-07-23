@@ -1,0 +1,29 @@
+-- AlterTable
+ALTER TABLE "attributes" ALTER COLUMN "created_by" SET DATA TYPE TEXT,
+ALTER COLUMN "updated_by" SET DATA TYPE TEXT,
+ALTER COLUMN "deleted_by" SET DATA TYPE TEXT;
+
+-- AlterTable
+ALTER TABLE "classes" ALTER COLUMN "created_by" SET DATA TYPE TEXT,
+ALTER COLUMN "updated_by" SET DATA TYPE TEXT,
+ALTER COLUMN "deleted_by" SET DATA TYPE TEXT;
+
+-- AlterTable
+ALTER TABLE "courses" ALTER COLUMN "created_by" SET DATA TYPE TEXT,
+ALTER COLUMN "updated_by" SET DATA TYPE TEXT,
+ALTER COLUMN "deleted_by" SET DATA TYPE TEXT;
+
+-- AlterTable
+ALTER TABLE "roles" ALTER COLUMN "created_by" SET DATA TYPE TEXT,
+ALTER COLUMN "updated_by" SET DATA TYPE TEXT,
+ALTER COLUMN "deleted_by" SET DATA TYPE TEXT;
+
+-- AlterTable
+ALTER TABLE "tenants" ALTER COLUMN "created_by" SET DATA TYPE TEXT,
+ALTER COLUMN "updated_by" SET DATA TYPE TEXT,
+ALTER COLUMN "deleted_by" SET DATA TYPE TEXT;
+
+-- AlterTable
+ALTER TABLE "users" ALTER COLUMN "created_by" SET DATA TYPE TEXT,
+ALTER COLUMN "updated_by" SET DATA TYPE TEXT,
+ALTER COLUMN "deleted_by" SET DATA TYPE TEXT;
