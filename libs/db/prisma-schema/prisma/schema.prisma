@@ -1,0 +1,313 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../../node_modules/@prisma/lms-backend/client/prisma-schema"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Attribute {
+  attribute_id   String          @id @default(cuid())
+  name           String          @db.VarChar(100)
+  description    String?         @db.VarChar(255)
+  created_by     String?
+  created_at     DateTime?       @default(now()) @db.Timestamptz(6)
+  updated_by     String?
+  updated_at     DateTime?       @db.Timestamptz(6)
+  deleted_by     String?
+  deleted_at     DateTime?       @db.Timestamptz(6)
+  is_deleted     Boolean?        @default(false)
+  roleAttributes RoleAttribute[]
+
+  @@map("attributes")
+}
+
+model Role {
+  role_id        String          @id @default(cuid())
+  name           String          @unique @db.VarChar(100)
+  description    String?         @db.VarChar(255)
+  created_by     String?
+  created_at     DateTime?       @default(now()) @db.Timestamptz(6)
+  updated_by     String?
+  updated_at     DateTime?       @db.Timestamptz(6)
+  deleted_by     String?
+  deleted_at     DateTime?       @db.Timestamptz(6)
+  is_deleted     Boolean?        @default(false)
+  roleAttributes RoleAttribute[]
+  userRoles      UserRole[]
+
+  @@map("roles")
+}
+
+model RoleAttribute {
+  role_attribute_id String    @id @default(cuid())
+  role_id           String
+  attribute_id      String
+  Attribute         Attribute @relation(fields: [attribute_id], references: [attribute_id])
+  Role              Role      @relation(fields: [role_id], references: [role_id])
+
+  @@map("role_attributes")
+}
+
+model Tenant {
+  tenant_id    String       @id @default(cuid())
+  name         String
+  slug         String       @unique @default(cuid())
+  image        String?
+  domain       String       @unique
+  isActive     Boolean      @default(true)
+  created_by   String?
+  created_at   DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_by   String?
+  updated_at   DateTime?    @db.Timestamptz(6)
+  deleted_by   String?
+  deleted_at   DateTime?    @db.Timestamptz(6)
+  is_deleted   Boolean?     @default(false)
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  code         String?
+  country      String?
+  latitude     Float?
+  longitude    Float?
+  postalCode   String?
+  state        String?
+  status       TenantStatus @default(active)
+  classes      Class[]
+  courses      Course[]
+  users        User[]
+
+  @@map("tenants")
+}
+
+model User {
+  user_id                     String         @id @default(cuid())
+  tenantId                    String?
+  email                       String         @unique
+  phone                       String         @unique
+  password                    String
+  firstName                   String
+  lastName                    String
+  isActive                    Boolean        @default(true)
+  lastLoginAt                 DateTime?
+  created_by                  String?
+  created_at                  DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_by                  String?
+  updated_at                  DateTime?      @db.Timestamptz(6)
+  deleted_by                  String?
+  deleted_at                  DateTime?      @db.Timestamptz(6)
+  is_deleted                  Boolean?       @default(false)
+  password_reset_token        String?
+  password_reset_token_expiry DateTime?      @db.Timestamptz(6)
+  status                      Status         @default(active)
+  refreshTokens               RefreshToken[]
+  Teacher                     Teacher?
+  userRoles                   UserRole[]
+  tenant                      Tenant?        @relation(fields: [tenantId], references: [tenant_id])
+
+  @@map("users")
+}
+
+model UserRole {
+  user_role_id String @id @default(cuid())
+  user_id      String
+  role_id      String
+  Role         Role   @relation(fields: [role_id], references: [role_id])
+  User         User   @relation(fields: [user_id], references: [user_id])
+
+  @@map("user_roles")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [user_id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model Course {
+  id          String       @id @default(cuid())
+  tenantId    String
+  name        String
+  description String?
+  code        String
+  isActive    Boolean      @default(true)
+  created_by  String?
+  created_at  DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_by  String?
+  updated_at  DateTime?    @db.Timestamptz(6)
+  deleted_by  String?
+  deleted_at  DateTime?    @db.Timestamptz(6)
+  is_deleted  Boolean?     @default(false)
+  classes     Class[]
+  Tenant      Tenant       @relation(fields: [tenantId], references: [tenant_id])
+  enrollments Enrollment[]
+
+  @@unique([tenantId, code])
+  @@map("courses")
+}
+
+model Class {
+  id         String         @id @default(cuid())
+  tenantId   String
+  courseId   String
+  teacherId  String
+  name       String
+  section    String?
+  isActive   Boolean        @default(true)
+  created_by String?
+  created_at DateTime?      @default(now()) @db.Timestamptz(6)
+  updated_by String?
+  updated_at DateTime?      @db.Timestamptz(6)
+  deleted_by String?
+  deleted_at DateTime?      @db.Timestamptz(6)
+  is_deleted Boolean?       @default(false)
+  Course     Course         @relation(fields: [courseId], references: [id])
+  Tenant     Tenant         @relation(fields: [tenantId], references: [tenant_id])
+  students   StudentClass[]
+
+  @@map("classes")
+}
+
+model StudentClass {
+  id        String   @id @default(cuid())
+  studentId String
+  classId   String
+  createdAt DateTime @default(now())
+  Class     Class    @relation(fields: [classId], references: [id])
+
+  @@unique([studentId, classId])
+  @@map("student_classes")
+}
+
+model ParentStudent {
+  id        String   @id @default(cuid())
+  parentId  String
+  studentId String
+  createdAt DateTime @default(now())
+
+  @@unique([parentId, studentId])
+  @@map("parent_students")
+}
+
+model Enrollment {
+  id         String   @id @default(cuid())
+  studentId  String
+  courseId   String
+  enrolledAt DateTime @default(now())
+  course     Course   @relation(fields: [courseId], references: [id])
+
+  @@unique([studentId, courseId])
+  @@map("enrollments")
+}
+
+model Teacher {
+  id          String           @id @default(cuid())
+  user_id     String           @unique
+  isActive    Boolean          @default(true)
+  created_by  String?
+  created_at  DateTime?        @default(now()) @db.Timestamptz(6)
+  updated_by  String?
+  updated_at  DateTime?        @db.Timestamptz(6)
+  deleted_by  String?
+  deleted_at  DateTime?        @db.Timestamptz(6)
+  is_deleted  Boolean?         @default(false)
+  assignments Assignment[]
+  User        User             @relation(fields: [user_id], references: [user_id])
+  subjects    TeacherSubject[]
+
+  @@map("teacher")
+}
+
+model Subject {
+  id          String           @id @default(cuid())
+  name        String
+  isActive    Boolean          @default(true)
+  created_by  String?
+  created_at  DateTime?        @default(now()) @db.Timestamptz(6)
+  updated_by  String?
+  updated_at  DateTime?        @db.Timestamptz(6)
+  deleted_by  String?
+  deleted_at  DateTime?        @db.Timestamptz(6)
+  is_deleted  Boolean?         @default(false)
+  assignments Assignment[]
+  teachers    TeacherSubject[]
+
+  @@map("subject")
+}
+
+model Grade {
+  id          String       @id @default(cuid())
+  name        String
+  isActive    Boolean      @default(true)
+  created_by  String?
+  created_at  DateTime?    @default(now()) @db.Timestamptz(6)
+  updated_by  String?
+  updated_at  DateTime?    @db.Timestamptz(6)
+  deleted_by  String?
+  deleted_at  DateTime?    @db.Timestamptz(6)
+  is_deleted  Boolean?     @default(false)
+  assignments Assignment[]
+
+  @@map("grade")
+}
+
+model TeacherSubject {
+  id         String    @id @default(cuid())
+  teacherId  String
+  subjectId  String
+  isActive   Boolean   @default(true)
+  created_by String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_by String?
+  updated_at DateTime? @db.Timestamptz(6)
+  deleted_by String?
+  deleted_at DateTime? @db.Timestamptz(6)
+  is_deleted Boolean?  @default(false)
+  subject    Subject   @relation(fields: [subjectId], references: [id])
+  teacher    Teacher   @relation(fields: [teacherId], references: [id])
+
+  @@unique([teacherId, subjectId])
+  @@map("teacher_subject")
+}
+
+model Assignment {
+  id         String    @id @default(cuid())
+  teacherId  String
+  subjectId  String
+  gradeId    String
+  schedule   String
+  isActive   Boolean   @default(true)
+  created_by String?
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+  updated_by String?
+  updated_at DateTime? @db.Timestamptz(6)
+  deleted_by String?
+  deleted_at DateTime? @db.Timestamptz(6)
+  is_deleted Boolean?  @default(false)
+  grade      Grade     @relation(fields: [gradeId], references: [id])
+  subject    Subject   @relation(fields: [subjectId], references: [id])
+  teacher    Teacher   @relation(fields: [teacherId], references: [id])
+
+  @@map("assignment")
+}
+
+enum TenantStatus {
+  pending
+  active
+  inactive
+  suspended
+}
+
+enum Status {
+  pending
+  active
+  inactive
+  suspended
+}

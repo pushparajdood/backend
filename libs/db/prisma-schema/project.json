@@ -1,0 +1,34 @@
+{
+  "name": "prisma-schema",
+  "$schema": "../../../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/db/prisma-schema/prisma",
+  "root": "libs/db/prisma-schema",
+  "projectType": "library",
+  "tags": [],
+  "targets": {
+    "prisma": {
+      "command": "prisma generate",
+      "options": {
+        "cwd": "libs/db/prisma-schema"
+      }
+    },
+    "migrate": {
+      "command": "prisma migrate dev --name=kulish_dev",
+      "options": {
+        "cwd": "libs/db/prisma-schema"
+      }
+    },
+    "generate-types": {
+      "command": "prisma generate",
+      "options": {
+        "cwd": "libs/db/prisma-schema"
+      }
+    },
+    "seed": {
+      "command": "npx prisma db seed",
+      "options": {
+        "cwd": "libs/db/prisma-schema"
+      }
+    }
+  }
+}
