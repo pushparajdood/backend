@@ -98,6 +98,9 @@
     "webpack-cli": "^5.1.4"
   },
   "overrides": {
-    "stylus": "0.59.0"
+    "stylus": "0.0.1-security"
+  },
+  "resolutions": {
+    "stylus": "0.0.1-security"
   }
 }
