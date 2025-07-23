@@ -96,5 +96,8 @@
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.29.0",
     "webpack-cli": "^5.1.4"
+  },
+  "overrides": {
+    "stylus": "0.59.0"
   }
 }
