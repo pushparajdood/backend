@@ -1,16 +1,20 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "dist/apps/super-admin/main.js",
-      "use": "@vercel/node"
+  "installCommand": "npm install",
+  "buildCommand": "npm run db && npm run build:super-admin",
+  "outputDirectory": ".",
+
+  "functions": {
+    "api/main.js": {
+      "includeFiles": "{dist/apps/super-admin/**,node_modules/@prisma/lms-backend/client/prisma-schema/**}"
     }
-  ],
+  },
+
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/apps/super-admin/main.js",
-      "methods": ["GET", "POST", "PUT", "DELETE"]
+      "dest": "api/main.js",
+      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
     }
   ]
 }
